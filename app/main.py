@@ -1,4 +1,5 @@
 import uuid
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from time import perf_counter
 
@@ -15,14 +16,15 @@ settings = get_settings()
 setup_logging()
 logger = get_logger(__name__)
 
-app = FastAPI(title=settings.app_name, version=settings.app_version)
-app.state.started_at = datetime.now(timezone.utc)
-
-
-@app.on_event("startup")
-def startup_event() -> None:
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     app.state.started_at = datetime.now(timezone.utc)
     logger.info("Application started", extra={"service": settings.app_name, "version": settings.app_version})
+    yield
+
+
+app = FastAPI(title=settings.app_name, version=settings.app_version, lifespan=lifespan)
+app.state.started_at = datetime.now(timezone.utc)
 
 
 @app.middleware("http")
@@ -85,7 +87,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     code, message = _friendly_validation_error(exc)
     payload = _error_payload(request, code=code, message=message)
-    return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=payload)
+    return JSONResponse(status_code=422, content=payload)
 
 
 @app.exception_handler(Exception)
