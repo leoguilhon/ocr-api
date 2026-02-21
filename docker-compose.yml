@@ -1,0 +1,7 @@
+services:
+  ocr-api:
+    build: .
+    container_name: ocr-api
+    ports:
+      - "8080:8000"
+    restart: unless-stopped
