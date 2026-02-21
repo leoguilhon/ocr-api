@@ -1,6 +1,6 @@
 # ocr-api
 
-API OCR pronta para produção, construída com FastAPI e PaddleOCR (CPU), ideal para portfólio e evolução para cenários reais de documentos fiscais, recibos e formulários.
+API OCR pronta para produção, construída com FastAPI e PaddleOCR (CPU), utilizando simulação para cenários reais de documentos fiscais, recibos e formulários.
 
 ## Principais recursos
 
